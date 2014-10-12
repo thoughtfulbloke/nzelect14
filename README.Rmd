@@ -1,0 +1,364 @@
+---
+title: "election 2014"
+author: "David Hood"
+date: "10 October 2014"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+---
+
+This is my own odds and ends of things about the New Zealand Election, it does not include the easy things, like the number of votes each party got in each electorate, but includes some things that need some more processing. I am assuming people are familiar with how New Zealands election is an MMP one.
+
+# Sources
+
+2014 Election Results are available at <http://www.electionresults.govt.nz>
+
+2011 Election Results are available at <http://www.electionresults.govt.nz/electionresults_2011/>
+
+But for this I have used the compiled election results at <https://github.com/jmarshallnz/nzpol/tree/swing/swing/data> for elect2011.csv, elect2014.csv, party2011.csv, party2014.csv
+
+The number on the roll in 2014 in electoraldata14.txt comes from <http://www.elections.org.nz/research-statistics/enrolment-statistics-electorate> and <http://www.elections.org.nz/research-statistics/maori-enrolment-statistics-electorate>. The 2011 data in electoraldata11.txt comes from picking through entries in the Wayback Machine <http://archive.org/web/> since there were no obvious historical figures elsewhere.
+
+The hexmap (http://rpubs.com/thoughtfulbloke/hexmap) positions are based on my interpretation of the layout developed by David Friggens <https://a3995c31ebd7ea534f2bb73d7af5d1ab1163a570.googledrive.com/host/0B-6BcF0gNMHCWjBYMm9jSmxlMTg/> which is an update of a layout of Chris McDonald <http://hindsight.clerestories.com/2014/01/06/chris-mcdowall-hexagonal-maps/>
+
+__Note__: The Data files are in utf-8 to correctly represent Māori characters.
+
+```{r}
+electoraldata11 <- read.table("data/electoraldata11.txt", stringsAsFactors=FALSE, sep="\t", header=TRUE)
+electoraldata14 <- read.table("data/electoraldata14.txt", stringsAsFactors=FALSE, sep="\t", header=TRUE)
+elect2011 <- read.csv("data/elect2011.csv", stringsAsFactors=FALSE)
+elect2014 <- read.csv("data/elect2014.csv", stringsAsFactors=FALSE)
+party2011 <- read.csv("data/party2011.csv", stringsAsFactors=FALSE)
+party2014 <- read.csv("data/party2014.csv", stringsAsFactors=FALSE)
+
+e11 <- merge(elect2011, electoraldata11, by.x="X", by.y="Electorate")
+e14 <- merge(elect2014, electoraldata14, by.x="X", by.y="Electorate")
+
+p11 <- merge(party2011, electoraldata11, by.x="X", by.y="Electorate")
+p14 <- merge(party2014, electoraldata14, by.x="X", by.y="Electorate")
+
+tp11 <- p11[,1:16]
+tp11[,2:16] <- p11[,2:16]/p11$Gen
+tp14 <- p14[,1:18]
+tp14[,2:18] <- p14[,2:18]/p14$Gen
+
+tp11$X[tp11$X == "Ōhariu"] <- "Ōhāriu" #matching names between
+tp11to14 <- merge(tp11,tp14, by="X")
+
+```
+
+# Inter-election results
+
+Making the comparison of party vote as percent of electorate in 2008 vs party vote as percent of electorate in 2011 (on the assumption the electorates with the same name are compariable, which ignores the effect of boundary changes).
+
+
+## National Party compared to previous election:
+
+The National comparison between elections looks like:
+
+```{r, fig.height=6, fig.width=6}
+largestside= max(c(tp11to14$National.Party.y, tp11to14$National.Party.x))
+plot(c(0,largestside),c(0,largestside), xlab="Party Vote proportion 2011", ylab="Party Vote proportion 2014", type="n")
+points(tp11to14$National.Party.x, tp11to14$National.Party.y, pch=19, col="#0000FF33")
+lines(c(-1,1),c(-1,1), col="#44444444")
+nlm <- lm(tp11to14$National.Party.y ~ 0 + tp11to14$National.Party.x) #goes through 0
+abline(nlm, col="#0000FF")
+```
+
+The gray line is the "line of same as last time", and the top left points are electorates that did better than last time. The blue line is the typical National result, so the distance above or below the line is how much better or worse the electorate improved relative to the typical result.
+
+### Electorates in both electorates (in order of most improved)
+```{r, results='asis'}
+display = data.frame(electorate= tp11to14$X, change=nlm$residuals)
+display = display[order(-display$change),]
+knitr::kable(display)
+```
+
+Electorates with a change between `r mean(display$change) - 3* sd(display$change)` and `r mean(display$change) + 3* sd(display$change)` (3 standard deviations) are highly unusual so Rangitata should be of particular interest to see what happened there.
+
+```{r, fig.height=3, fig.width=6}
+rounded <- round(display$change, digits=3)
+stripchart(rounded,method = "stack", frame.plot=FALSE, pch=19, col="#0000FF", at=0.05,offset=0.5)
+```
+
+## Labour Party compared to previous election:
+
+The Labour comparison between elections looks like:
+
+```{r, fig.height=6, fig.width=6}
+largestside= max(c(tp11to14$Labour.Party.y, tp11to14$Labour.Party.x))
+plot(c(0,largestside),c(0,largestside), xlab="Party Vote proportion 2011", ylab="Party Vote proportion 2014", type="n")
+points(tp11to14$Labour.Party.x, tp11to14$Labour.Party.y, pch=19, col="#FF000033")
+lines(c(-1,1),c(-1,1), col="#44444444")
+llm <- lm(tp11to14$Labour.Party.y ~ 0 + tp11to14$Labour.Party.x) #goes through 0
+abline(llm, col="#FF0000")
+```
+
+The gray line is the "line of same as last time", and the top left points are electorates that did better than last time. The red line is the typical Labour result, so the distance above or below the line is how much better or worse the electorate improved relative to the typical result.
+
+### Electorates in both electorates (in order of most improved)
+```{r, results='asis'}
+display = data.frame(electorate= tp11to14$X, change=llm$residuals)
+display = display[order(-display$change),]
+knitr::kable(display)
+```
+
+Electorates with a change between `r mean(display$change) - 3* sd(display$change)` and `r mean(display$change) + 3* sd(display$change)` (3 standard deviations) are highly unusual so no electorates were that unusual.
+
+```{r, fig.height=3, fig.width=6}
+rounded <- round(display$change, digits=3)
+stripchart(rounded,method = "stack", frame.plot=FALSE, pch=19, col="#FF0000", at=0.05,offset=0.5)
+```
+
+## Green Party compared to previous election:
+
+The Greens comparison between elections looks like:
+
+```{r, fig.height=6, fig.width=6}
+largestside= max(c(tp11to14$Green.Party.y, tp11to14$Green.Party.x))
+plot(c(0,largestside),c(0,largestside), xlab="Party Vote proportion 2011", ylab="Party Vote proportion 2014", type="n")
+points(tp11to14$Green.Party.x, tp11to14$Green.Party.y, pch=19, col="#00FF0033")
+lines(c(-1,1),c(-1,1), col="#44444444")
+glm <- lm(tp11to14$Green.Party.y ~ 0 + tp11to14$Green.Party.x) #goes through 0
+abline(glm, col="#00FF00")
+```
+
+The gray line is the "line of same as last time", and the top left points are electorates that did better than last time. The green line is the typical Green result, so the distance above or below the line is how much better or worse the electorate improved relative to the typical result.
+
+### Electorates in both electorates (in order of most improved)
+```{r, results='asis'}
+display = data.frame(electorate= tp11to14$X, change=glm$residuals)
+display = display[order(-display$change),]
+knitr::kable(display)
+```
+
+Electorates with a change between `r mean(display$change) - 3* sd(display$change)` and `r mean(display$change) + 3* sd(display$change)` (3 standard deviations) are highly unusual so Helensville and Mt Albert should be of particular interest to see what happened there.
+
+```{r, fig.height=3, fig.width=6}
+rounded <- round(display$change, digits=3)
+stripchart(rounded,method = "stack", frame.plot=FALSE, pch=19, col="#00FF00", at=0.05,offset=0.5)
+```
+
+
+
+## New Zealand First Party compared to previous election:
+
+The New Zealand First comparison between elections looks like:
+
+```{r, fig.height=6, fig.width=6}
+largestside= max(c(tp11to14$New.Zealand.First.Party.y, tp11to14$New.Zealand.First.Party.x))
+plot(c(0,largestside),c(0,largestside), xlab="Party Vote proportion 2011", ylab="Party Vote proportion 2014", type="n")
+points(tp11to14$New.Zealand.First.Party.x, tp11to14$New.Zealand.First.Party.y, pch=19, col="#00000033")
+lines(c(-1,1),c(-1,1), col="#44444444")
+nzflm <- lm(tp11to14$New.Zealand.First.Party.y ~ 0 + tp11to14$New.Zealand.First.Party.x) #goes through 0
+abline(nzflm, col="#000000")
+```
+
+The gray line is the "line of same as last time", and the top left points are electorates that did better than last time. The black line is the typical New Zealand First result, so the distance above or below the line is how much better or worse the electorate improved relative to the typical result.
+
+### Electorates in both elections (in order of most improved)
+```{r, results='asis'}
+display = data.frame(electorate= tp11to14$X, change=nzflm$residuals)
+display = display[order(-display$change),]
+knitr::kable(display)
+```
+
+Electorates with a change between `r mean(display$change) - 3* sd(display$change)` and `r mean(display$change) + 3* sd(display$change)` (3 standard deviations) are highly unusual so the fall in Tauranga would seem to be the most interesting result. I would also note Winston Peter's direct appeal to New Zealand First supporters in Te Tai Tokerau seems to have had an effect on turnout there.
+
+```{r, fig.height=3, fig.width=6}
+rounded <- round(display$change, digits=3)
+stripchart(rounded,method = "stack", frame.plot=FALSE, pch=19, col="#000000", at=0.05,offset=0.5)
+```
+
+As a general comment, the shift in popularity between elections seems to be more a measure of general party support, as all the trend lines were fairly strong between electorates for each party.
+
+
+## Turnout Change correlations
+
+Looking at the residuals of the changes in turnout, we can examine correlations between the parties, basically asking a question "are the changes in turnout for one party reflected in the changes for another party", which could suggest a postive or negative relationship. 1 is a perfect positive correlation, -1 is a perfect negative correlation, 0 is no correlation.
+
+* National and Labour `r cor(nlm$residuals, llm$residuals)`
+* National and Greens `r cor(nlm$residuals, glm$residuals)`
+* National and New Zealand First `r cor(nlm$residuals, nzflm$residuals)`
+* Labour and Greens `r cor(llm$residuals, glm$residuals)`
+* Labour and New Zealand First `r cor(llm$residuals, nzflm$residuals)`
+* Greens and New Zealand First `r cor(glm$residuals, nzflm$residuals)`
+
+This suggests that the strongest relationship, given the two elections, is that in electorates where Labour turned out well New Zealand First also turned out well. In electorates where Labour voters stayed home so did New Zealand First voters.
+
+Looking through the scatterplots for all the larger parties, the trend lines are fairly consistant, suggestion changes in nationwide support for the party is more important than the actions of local candidates.
+
+# 2014 results
+
+Focusing on the 2014 elections only, and using all 71 electorates for that election.
+
+## 2014 vote splitting
+
+If a candidate belonging to a party gets a different number of votes than the party vote, some people must not have voted for both. The total of the difference for each electorate divided by two is the minimum number of people that must have split their vote (the maximum number is 100% except in cases where both the candidate and the party recieved more than 50% of the vote, when the maxmimum becomes twice the total of all other parties). When can use this minimum figure as a metric for "how MMP" each electorate voted.
+
+```{r}
+all14 <- merge(p14, e14, by="X")
+nato0 <- all14[,c(2:21,23:35)]
+nato0[is.na(nato0)] <- 0
+all14[,c(2:21,23:35)] <- nato0
+
+all14$splits <- (abs(all14$National.Party - all14$National) + abs(all14$Labour.Party - all14$Labour) + abs(all14$Green.Party - all14$Green) + abs(all14$New.Zealand.First.Party - all14$NZ.First) + abs(all14$Conservative.x - all14$Conservative.y) + abs(all14$Internet.MANA - all14$MANA) + abs(all14$Māori.Party - all14$Māori) + abs(all14$ACT.New.Zealand - all14$ACT) +  abs(all14$United.Future.x - all14$United.Future.y)) / (2* all14$TOTAL.y)
+display = all14[,c("X","splits")]
+names(display) <- c("Electorate", "MMPness")
+display = display[order(-display$MMPness),]
+knitr::kable(display)
+```
+
+The four electorates that saw the most vote splitting (led by Ōhāriu with 47.6% vote splitting) we all electorates where the election of a electorate candidate could make a big difference to the overall shape of parliament.
+
+## Two Party comparisons
+
+By subtracting the votes for one party by the votes for another party we can get the overall national difference of support for both parties, then ask the question how much do individual electorates vary in support. As electorates are not of indentical size, I have divided the difference by the number of potential voters so the difference are normalised for electorate. I have also calculated the z-score to determine 3 categories of electorates. Supportive of each party and in between. In reality life is not a binary choice.
+
+```{r}
+areas <- read.csv("data/hex2.csv", stringsAsFactors=FALSE)
+library(plotrix)
+hexmap <- function(xcor,ycor,colval){
+  plot(min(c(xcor,ycor)):(max(c(xcor,ycor))+1),min(c(xcor,ycor)):(max(c(xcor,ycor))+1), type="n", frame.plot=F, xaxt="n", yaxt="n", xlab="", ylab="")
+  data <- data.frame(xcor,ycor,colval)
+  apply(data, 1, function(zone) hexagon(zone[1],zone[2],col=zone[3], unitcell=0.95,border="white"))
+  polygon(c(-2,-2,6,6),c(40,20,20,40))
+  text(2.8,21,"Maori electorates", cex=0.6)
+  text(2.8,19,"General electorates", cex=0.6)
+}
+
+all14w.area <- merge(all14,areas, by="X")
+```
+
+Party A area > 1 z-score, typical area, -1 z-score > party B area
+
+### National and Labour
+
+```{r, fig.height=6, fig.width=6}
+team1 <- all14w.area$National.Party
+team2 <- all14w.area$Labour.Party
+diff <- (team1 - team2)/all14w.area$TOTAL.x
+zscore <- (diff - mean(diff))/sd(diff)
+mycols <- rep(4, length(zscore))
+mycols[zscore <= 1] <- 8
+mycols[zscore < -1] <- 2
+hexmap(all14w.area$xcord, all14w.area$ycord, mycols)
+adf <- data.frame(electorate = all14w.area$X, zscore)
+```
+
+```{r, results='asis'}
+knitr::kable(adf[order(-adf$zscore),])
+```
+
+### National and Green
+
+```{r, fig.height=6, fig.width=6}
+team1 <- all14w.area$National.Party
+team2 <- all14w.area$Green.Party
+diff <- (team1 - team2)/all14w.area$TOTAL.x
+zscore <- (diff - mean(diff))/sd(diff)
+mycols <- rep(4, length(zscore))
+mycols[zscore <= 1] <- 8
+mycols[zscore < -1] <- 3
+hexmap(all14w.area$xcord, all14w.area$ycord, mycols)
+adf <- data.frame(electorate = all14w.area$X, zscore)
+```
+
+```{r, results='asis'}
+knitr::kable(adf[order(-adf$zscore),])
+```
+
+### National and New Zealand First
+
+```{r, fig.height=6, fig.width=6}
+team1 <- all14w.area$National.Party
+team2 <- all14w.area$New.Zealand.First.Party
+diff <- (team1 - team2)/all14w.area$TOTAL.x
+zscore <- (diff - mean(diff))/sd(diff)
+mycols <- rep(4, length(zscore))
+mycols[zscore <= 1] <- 8
+mycols[zscore < -1] <- 1
+hexmap(all14w.area$xcord, all14w.area$ycord, mycols)
+adf <- data.frame(electorate = all14w.area$X, zscore)
+```
+
+```{r, results='asis'}
+knitr::kable(adf[order(-adf$zscore),])
+```
+
+### Labour and Green
+
+```{r, fig.height=6, fig.width=6}
+team1 <- all14w.area$Labour.Party
+team2 <- all14w.area$Green.Party
+diff <- (team1 - team2)/all14w.area$TOTAL.x
+zscore <- (diff - mean(diff))/sd(diff)
+mycols <- rep(2, length(zscore))
+mycols[zscore <= 1] <- 8
+mycols[zscore < -1] <- 3
+hexmap(all14w.area$xcord, all14w.area$ycord, mycols)
+adf <- data.frame(electorate = all14w.area$X, zscore)
+```
+
+```{r, results='asis'}
+knitr::kable(adf[order(-adf$zscore),])
+```
+
+### Labour and New Zealand First
+
+```{r, fig.height=6, fig.width=6}
+team1 <- all14w.area$Labour.Party
+team2 <- all14w.area$New.Zealand.First.Party
+diff <- (team1 - team2)/all14w.area$TOTAL.x
+zscore <- (diff - mean(diff))/sd(diff)
+mycols <- rep(2, length(zscore))
+mycols[zscore <= 1] <- 8
+mycols[zscore < -1] <- 1
+hexmap(all14w.area$xcord, all14w.area$ycord, mycols)
+adf <- data.frame(electorate = all14w.area$X, zscore)
+```
+
+```{r, results='asis'}
+knitr::kable(adf[order(-adf$zscore),])
+```
+
+### Green and New Zealand First
+
+```{r, fig.height=6, fig.width=6}
+team1 <- all14w.area$Green.Party
+team2 <- all14w.area$New.Zealand.First.Party
+diff <- (team1 - team2)/all14w.area$TOTAL.x
+zscore <- (diff - mean(diff))/sd(diff)
+mycols <- rep(3, length(zscore))
+mycols[zscore <= 1] <- 8
+mycols[zscore < -1] <- 1
+hexmap(all14w.area$xcord, all14w.area$ycord, mycols)
+adf <- data.frame(electorate = all14w.area$X, zscore)
+```
+
+```{r, results='asis'}
+knitr::kable(adf[order(-adf$zscore),])
+```
+
+
+### Bonus: Conservative and Aotearoa Legalise Cannabis Party
+
+
+```{r, fig.height=6, fig.width=6}
+team1 <- all14w.area$Conservative.x
+team2 <- all14w.area$Aotearoa.Legalise.Cannabis.Party
+diff <- (team1 - team2)/all14w.area$TOTAL.x
+zscore <- (diff - mean(diff))/sd(diff)
+mycols <- rep(5, length(zscore))
+mycols[zscore <= 1] <- 8
+mycols[zscore < -1] <- 6
+hexmap(all14w.area$xcord, all14w.area$ycord, mycols)
+adf <- data.frame(electorate = all14w.area$X, zscore)
+```
+
+```{r, results='asis'}
+knitr::kable(adf[order(-adf$zscore),])
+```
+
+
