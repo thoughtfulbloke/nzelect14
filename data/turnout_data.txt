@@ -1,0 +1,72 @@
+electorate	map_xcord	map_ycord	map_type	roll_size	total_party_voters	winner_electorate
+Auckland Central	8.5	24	g	35264	28256	NAT
+Bay of Plenty	11.5	18	g	45347	36675	NAT
+Botany	10.5	22	g	46935	33684	NAT
+Christchurch Central	5	7	g	43463	34372	NAT
+Christchurch East	5.5	8	g	42384	32630	LAB
+Clutha-Southland	1.5	2	g	43408	34336	NAT
+Coromandel	11	19	g	47500	38048	NAT
+Dunedin North	3	3	g	43442	35131	LAB
+Dunedin South	2	3	g	45952	37789	LAB
+East Coast	12.5	16	g	45996	35427	NAT
+East Coast Bays	8.5	26	g	43248	33041	NAT
+Epsom	9	23	g	47491	37675	ACT
+Hamilton East	10.5	18	g	44841	34934	NAT
+Hamilton West	9.5	18	g	44584	33829	NAT
+Hauraki-Waikato	2.5	26	m	33730	21216	LAB
+Helensville	7.5	26	g	42500	35434	NAT
+Hunua	10.5	20	g	44133	35993	NAT
+Hutt South	9	11	g	47711	39161	LAB
+Ikaroa-Rāwhiti	3	25	m	33678	22136	LAB
+Ilam	4	7	g	44298	35377	NAT
+Invercargill	1	1	g	44616	34266	NAT
+Kaikōura	5.5	10	g	45592	36791	NAT
+Kelston	7	23	g	41650	30880	LAB
+Mana	8.5	12	g	44758	36793	LAB
+Māngere	9	21	g	40454	27597	LAB
+Manukau East	9.5	22	g	39760	27071	LAB
+Manurewa	10	21	g	40142	27687	LAB
+Maungakiekie	10	23	g	45264	34831	NAT
+Mt Albert	8	23	g	45569	36922	LAB
+Mt Roskill	8.5	22	g	45558	34097	LAB
+Napier	11	15	g	45020	36605	LAB
+Nelson	4.5	10	g	47358	38174	NAT
+New Lynn	7.5	22	g	44263	33661	LAB
+New Plymouth	9.5	16	g	48225	37681	NAT
+North Shore	9.5	26	g	48530	38585	NAT
+Northcote	9	25	g	46071	35416	NAT
+Northland	7.5	28	g	44454	35707	NAT
+Ōhāriu	8	11	g	44410	37450	UFNZ
+Ōtaki	9	13	g	46326	38710	NAT
+Pakuranga	11	23	g	45772	34621	NAT
+Palmerston North	9.5	14	g	42701	34427	LAB
+Papakura	9.5	20	g	45238	34765	NAT
+Port Hills	4.5	6	g	48700	39970	LAB
+Rangitata	3	5	g	46174	36351	NAT
+Rangitīkei	10	15	g	42564	34784	NAT
+Rimutaka	9.5	12	g	45912	37194	LAB
+Rodney	8	27	g	47707	39414	NAT
+Rongotai	8.5	10	g	46033	38731	LAB
+Rotorua	11.5	16	g	42919	34049	NAT
+Selwyn	4.5	8	g	42111	35940	NAT
+Tāmaki	9.5	24	g	45221	36748	NAT
+Tāmaki Makaurau	2	27	m	34557	20848	LAB
+Taranaki-King Country	10	17	g	41726	33678	NAT
+Taupō	11	17	g	45867	36362	NAT
+Tauranga	12.5	18	g	46449	37294	NAT
+Te Atatū	7.5	24	g	43959	33335	LAB
+Te Tai Hauāuru	2	25	m	31703	20699	LAB
+Te Tai Tokerau	1.5	28	m	33627	22910	LAB
+Te Tai Tonga	1.5	24	m	32541	20730	LAB
+Tukituki	10.5	14	g	44968	36057	NAT
+Upper Harbour	8	25	g	44809	33403	NAT
+Waiariki	3.5	26	m	34447	22398	MAOR
+Waikato	10	19	g	45142	36000	NAT
+Waimakariri	5	9	g	44004	36168	NAT
+Wairarapa	10	13	g	46487	37525	NAT
+Waitaki	2.5	4	g	48328	39769	NAT
+Wellington Central	7.5	10	g	45473	39131	LAB
+West Coast-Tasman	3.5	8	g	44725	36053	LAB
+Whanganui	10.5	16	g	45882	35407	NAT
+Whangarei	8.5	28	g	46673	36949	NAT
+Wigram	3.5	6	g	39903	30703	LAB
